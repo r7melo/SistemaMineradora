@@ -1,0 +1,76 @@
+/* Animações e Auxiliares para o Template */
+
+.fade-in-up {
+  animation: fadeInUp 0.35s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pulse {
+  animation: pulseAnim 2s infinite;
+}
+
+@keyframes pulseAnim {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* Ajustes finos de compatibilidade com React */
+.admin-sidebar {
+  border-right: 1px solid var(--admin-border);
+}
+
+.table-responsive {
+  margin-top: 1rem;
+}
+
+.panel {
+  margin-bottom: 1.5rem;
+}
+
+/* Forçar visualização correta do formulário no tema escuro */
+html[data-theme="dark"] input, 
+html[data-theme="dark"] select, 
+html[data-theme="dark"] textarea {
+  background-color: var(--admin-surface-soft) !important;
+  color: var(--admin-text) !important;
+  border-color: var(--admin-border) !important;
+}
+
+html[data-theme="dark"] input:focus, 
+html[data-theme="dark"] select:focus, 
+html[data-theme="dark"] textarea:focus {
+  border-color: var(--admin-primary) !important;
+}
+
+/* Forçar rodapé colado no final da tela (Sticky Footer) */
+.admin-main {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100vh !important;
+}
+
+.dashboard-content {
+  flex: 1 !important;
+}
+
+.admin-footer {
+  margin-top: auto !important;
+}
+
