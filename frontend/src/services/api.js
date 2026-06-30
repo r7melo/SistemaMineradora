@@ -1,73 +1,213 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+import { createClient } from '@supabase/supabase-js';
 
-async function apiCall(endpoint, options = {}) {
-  const url = `${API_URL}${endpoint}`;
-  
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {})
-  };
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  const config = {
-    ...options,
-    headers
-  };
-
-  if (config.body && typeof config.body === 'object') {
-    config.body = JSON.stringify(config.body);
-  }
-
-  try {
-    const response = await fetch(url, config);
-    
-    // For DELETE or empty responses, we might not have JSON content
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : {};
-
-    if (!response.ok) {
-      throw new Error(data.message || data.error || `Erro HTTP: ${response.status}`);
-    }
-
-    // Standardize to match controller output
-    return { data };
-  } catch (error) {
-    console.error(`Erro na requisição para ${endpoint}:`, error);
-    throw error;
-  }
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn('Variáveis de ambiente do Supabase não configuradas no frontend/.env');
 }
 
+export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+
 export const cidadeService = {
-  listar: () => apiCall('/cidades'),
-  buscarPorId: (id) => apiCall(`/cidades/${id}`),
-  criar: (dados) => apiCall('/cidades', { method: 'POST', body: dados }),
-  atualizar: (id, dados) => apiCall(`/cidades/${id}`, { method: 'PUT', body: dados }),
-  excluir: (id) => apiCall(`/cidades/${id}`, { method: 'DELETE' }),
+  listar: async () => {
+    const { data, error } = await supabase
+      .from('min_cidades')
+      .select('*')
+      .order('id', { ascending: true });
+    if (error) throw error;
+    return { data };
+  },
+  buscarPorId: async (id) => {
+    const { data, error } = await supabase
+      .from('min_cidades')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  criar: async (dados) => {
+    const { data, error } = await supabase
+      .from('min_cidades')
+      .insert([dados])
+      .select()
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  atualizar: async (id, dados) => {
+    const { data, error } = await supabase
+      .from('min_cidades')
+      .update(dados)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  excluir: async (id) => {
+    const { error } = await supabase
+      .from('min_cidades')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return { data: {} };
+  },
 };
 
 export const equipamentoService = {
-  listar: () => apiCall('/equipamentos'),
-  buscarPorId: (id) => apiCall(`/equipamentos/${id}`),
-  criar: (dados) => apiCall('/equipamentos', { method: 'POST', body: dados }),
-  atualizar: (id, dados) => apiCall(`/equipamentos/${id}`, { method: 'PUT', body: dados }),
-  excluir: (id) => apiCall(`/equipamentos/${id}`, { method: 'DELETE' }),
+  listar: async () => {
+    const { data, error } = await supabase
+      .from('min_equipamentos')
+      .select('*')
+      .order('id', { ascending: true });
+    if (error) throw error;
+    return { data };
+  },
+  buscarPorId: async (id) => {
+    const { data, error } = await supabase
+      .from('min_equipamentos')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  criar: async (dados) => {
+    const { data, error } = await supabase
+      .from('min_equipamentos')
+      .insert([dados])
+      .select()
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  atualizar: async (id, dados) => {
+    const { data, error } = await supabase
+      .from('min_equipamentos')
+      .update(dados)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  excluir: async (id) => {
+    const { error } = await supabase
+      .from('min_equipamentos')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return { data: {} };
+  },
 };
 
 export const funcionarioService = {
-  listar: () => apiCall('/funcionarios'),
-  buscarPorId: (id) => apiCall(`/funcionarios/${id}`),
-  criar: (dados) => apiCall('/funcionarios', { method: 'POST', body: dados }),
-  atualizar: (id, dados) => apiCall(`/funcionarios/${id}`, { method: 'PUT', body: dados }),
-  excluir: (id) => apiCall(`/funcionarios/${id}`, { method: 'DELETE' }),
+  listar: async () => {
+    const { data, error } = await supabase
+      .from('min_funcionarios')
+      .select('*, cidades:min_cidades(nome)')
+      .order('id', { ascending: true });
+    if (error) throw error;
+    return { data };
+  },
+  buscarPorId: async (id) => {
+    const { data, error } = await supabase
+      .from('min_funcionarios')
+      .select('*, cidades:min_cidades(nome)')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  criar: async (dados) => {
+    const { data, error } = await supabase
+      .from('min_funcionarios')
+      .insert([dados])
+      .select()
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  atualizar: async (id, dados) => {
+    const { data, error } = await supabase
+      .from('min_funcionarios')
+      .update(dados)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  excluir: async (id) => {
+    const { error } = await supabase
+      .from('min_funcionarios')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return { data: {} };
+  },
 };
 
 export const servicoService = {
-  listar: () => apiCall('/servicos'),
-  buscarPorId: (id) => apiCall(`/servicos/${id}`),
-  criar: (dados) => apiCall('/servicos', { method: 'POST', body: dados }),
-  atualizar: (id, dados) => apiCall(`/servicos/${id}`, { method: 'PUT', body: dados }),
-  excluir: (id) => apiCall(`/servicos/${id}`, { method: 'DELETE' }),
+  listar: async () => {
+    const { data, error } = await supabase
+      .from('min_servicos')
+      .select('*, equipamentos:min_equipamentos(nome, patrimonio), funcionarios:min_funcionarios(nome)')
+      .order('id', { ascending: true });
+    if (error) throw error;
+    return { data };
+  },
+  buscarPorId: async (id) => {
+    const { data, error } = await supabase
+      .from('min_servicos')
+      .select('*, equipamentos:min_equipamentos(nome, patrimonio), funcionarios:min_funcionarios(nome)')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  criar: async (dados) => {
+    const { data, error } = await supabase
+      .from('min_servicos')
+      .insert([dados])
+      .select()
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  atualizar: async (id, dados) => {
+    const { data, error } = await supabase
+      .from('min_servicos')
+      .update(dados)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return { data };
+  },
+  excluir: async (id) => {
+    const { error } = await supabase
+      .from('min_servicos')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return { data: {} };
+  },
 };
 
 export const statusService = {
-  obterStatus: () => apiCall('/status'),
+  obterStatus: async () => {
+    try {
+      const { error } = await supabase
+        .from('min_cidades')
+        .select('id')
+        .limit(1);
+      if (error) throw error;
+      return { data: { database: 'OK' } };
+    } catch (err) {
+      return { data: { database: 'ERROR' } };
+    }
+  },
 };
